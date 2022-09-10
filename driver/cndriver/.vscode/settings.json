@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "uvm_hal.h": "c",
+        "uvm_va_block.h": "c",
+        "uvm_forward_decl.h": "c"
+    }
+}

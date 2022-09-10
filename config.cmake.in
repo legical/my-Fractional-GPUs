@@ -1,0 +1,47 @@
+# Configure the CMake options
+# 默认值 - 已启用
+# 禁用此选项将禁用计算分区。在这种情况下，每个应用程序都使用整个 GPU。
+# 启用此选项将启用计算分区。在这种情况下，每个应用程序仅使用 GPU 中总 SM 的子集。
+option(FGPU_COMP_COLORING_ENABLE "Enable computational coloring" ON)
+
+# 默认值 - 已启用
+# 禁用此禁用的内存带宽分区。在这种情况下，每个应用程序都利用整个 GPU 内存带宽。
+# 启用此已启用内存带宽分区。在这种情况下，每个应用程序仅使用整个 GPU 内存带宽的一小部分。
+# 目前，我们不支持没有计算分区的内存分区。
+option(FGPU_MEM_COLORING_ENABLED "Enable memory coloring" OFF)
+
+# 默认值 - 禁用。
+# 启用此功能可在使用 fgpu_memory_allocate（） API 时启用连续内存分配。
+# 仅当对新 GPU 进行逆向工程时，此功能才有用。
+# 在生产模式（即运行实际应用程序/基准测试时）保持禁用状态。
+# 这需要同时启用计算和内存着色。
+option(FGPU_TEST_MEM_COLORING_ENABLED "Enable for reverse engineering memory hierarchy" ON)
+
+# Deprecated options. Keep default value.
+
+# 默认值 - 禁用。已弃用 - 保留默认值。
+# 其目的是在使用大页面时进行内存着色。
+option(FGPU_USER_MEM_COLORING_ENABLED "Enable userspace coloring" OFF)
+option(FGPU_PARANOID_CHECK_ENABLED "Enable checks that are not strictly neccesary" OFF)
+option(FGPU_COMPUTE_CHECK_ENABLED "Checks that computation isolation is working correctly" OFF)
+option(FGPU_SERIALIZED_LAUNCH "As extra checks, allows only one kernel to launch (not execute) at a time" OFF)
+
+# 因此，使用FGPU的应用程序可以在以下模式下运行：
+# 
+# 无分区 No partitioning
+#   FGPU_COMP_COLORING_ENABLE已禁用。
+#   FGPU_MEM_COLORING_ENABLED已禁用。
+#   一个应用程序运行时使用整个 GPU 。
+# 计算分区 Compute partitioning
+#   FGPU_COMP_COLORING_ENABLE已启用。
+#   FGPU_MEM_COLORING_ENABLED被禁用。
+#   多个应用程序可以一起运行。
+# 计算和内存带宽分区 Compute and Memory bandwidth partitioning
+#   FGPU_COMP_COLORING_ENABLE已启用。
+#   FGPU_MEM_COLORING_ENABLED已启用。
+#   多个应用程序可以一起运行。
+# 逆向工程 Reverse engineering（不用于运行外部应用程序）
+#   FGPU_COMP_COLORING_ENABLE已启用。
+#   FGPU_MEM_COLORING_ENABLED被禁用。
+#   FGPU_TEST_MEM_COLORING_ENABLED已启用。
+#   在此方案中，只有逆向工程代码才打算运行（一次一个逆向工程应用程序）

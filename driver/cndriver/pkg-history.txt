@@ -1,0 +1,8 @@
+Package history for NVIDIA-Linux-x86_64-515.65.01-internal:
+
+NVIDIA-Linux-x86_64-515.65.01-internal: Initial package
+
+NVIDIA-Linux-x86_64-515.65.01: Added 32 bit compatibility libraries
+
+NVIDIA-Linux-x86_64-515.65.01: Added Wine files
+
