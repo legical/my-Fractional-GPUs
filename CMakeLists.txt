@@ -1,7 +1,7 @@
 # 架构 3060
 set(TARGET sm_86)
 # NVIDIA driver驱动路径
-set(NVIDIA_DRIVER_PATH driver/NVIDIA-Linux-x86_64-390.48)
+set(NVIDIA_DRIVER_PATH driver/cndriver)
 
 # TODO: Which version do we want?
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
