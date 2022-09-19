@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "nv_uvm_types.h": "c"
+        "nv_uvm_types.h": "c",
+        "xmemory": "cpp"
     }
 }

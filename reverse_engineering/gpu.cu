@@ -16,6 +16,7 @@
 #include <fractional_gpu.hpp>
 #include <fractional_gpu_cuda.cuh>
 
+// 没启用memory测试模式，就退出
 #if !defined(FGPU_TEST_MEM_COLORING_ENABLED)
 #error "FGPU_TEST_MEM_COLORING_ENABLED not defined. Needed for reverse engineering"
 #endif
@@ -35,6 +36,7 @@ static uint64_t *d_count;
 /* 
  * Read enough data to implicitly flush L2 cache.
  * Uses p-chase to make sure compiler/hardware doesn't optimize away the code.
+ * 读取足够的数据以隐式刷新L2缓存，使用p-chase来确保编译器/硬件不会优化掉代码
  */
 __device__
 uint64_t refresh_l2(volatile uint64_t *refresh_vaddr)
@@ -43,14 +45,18 @@ uint64_t refresh_l2(volatile uint64_t *refresh_vaddr)
     uint64_t sum = 0;
 
     while (curindex != (uint64_t)-1) {
+        // end loop
         curindex = refresh_vaddr[curindex];
         sum += curindex;
     }
     return sum;
 }
 
-/* Allocates contiguous memory and returns the starting physical address */
-/* For this to work, Nvidia driver must be configured properly. */
+/**
+ * @brief 分配连续的内存并返回起始物理地址。为使其发挥作用，必须正确配置Nvidia驱动程序
+ * Allocates contiguous memory and returns the starting physical address
+ * @note For this to work, Nvidia driver must be configured properly.
+ */
 void *device_allocate_contigous(size_t contiguous_size, void **phy_start_p)
 {
     size_t size = contiguous_size;

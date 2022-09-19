@@ -508,11 +508,12 @@ void *fgpu_memory_get_phy_address(void *addr)
 }
 
 
-#else /* FGPU_MEM_COLORING_ENABLED */
+#else /* NOT FGPU_MEM_COLORING_ENABLED */
 
 int fgpu_memory_allocate(void **p, size_t len)
 {
-    /*
+    /**
+     * @brief 我们使用cudaMallocManaged()而不是cudaMalloc()，因为要在启用和禁用内存着色之间进行公平比较。对于cudaMallocManaged()和cudaMalloc()来说，Memcpy()的速度较慢（小尺寸），但对于大于8MB的大尺寸来说，速度较快。我们怀疑这是由于Linux驱动内部的代码差异造成的
      * XXX: We are using cudaMallocManaged() nstead of just
      * cudaMalloc() because to make comparision fair between memory coloring
      * enabled v.s. disabled. Memcpy() is slower (for small sizes) for

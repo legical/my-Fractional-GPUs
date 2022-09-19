@@ -120,6 +120,7 @@ add_persistent_target(fgpu_server programs programs/server.cu)
 add_persistent_target(dummy_persistent programs/dummy_persistent
     programs/dummy_persistent/dummy_persistent.cu)
 
+# ***cuda_samples***
 # Matrix Multiplication
 add_native_target(matrixMul programs/cuda_samples/matrixMul
     programs/cuda_samples/matrixMul/matrixMul.cu)
@@ -139,6 +140,8 @@ add_persistent_target(sortingNetworks_persistent programs/cuda_sample/sortingNet
     programs/cuda_samples/sortingNetworks_persistent/bitonicSort.cu
     programs/cuda_samples/sortingNetworks_persistent/oddEvenMergeSort.cu
     programs/cuda_samples/sortingNetworks_persistent/sortingNetworks_validate.cpp)
+# ***cuda_samples***
+
 
 # Mandlebrot
 add_native_target(mandlebrot programs/mandlebrot
@@ -147,12 +150,14 @@ add_native_target(mandlebrot programs/mandlebrot
 add_persistent_target(mandlebrot_persistent programs/mandlebrot_persistent
     programs/mandlebrot_persistent/main.cu programs/mandlebrot_persistent/bmp.cpp)
 
+
 # Vector Add
 add_native_target(vector_add programs/vector_add
     programs/vector_add/main.cu)
 add_persistent_target(vector_add_persistent programs/vector_add_persistent
     programs/vector_add_persistent/main.cu)
 
+    
 # Saxpy
 add_native_target(saxpy programs/saxpy
     programs/saxpy/saxpy.cu)
