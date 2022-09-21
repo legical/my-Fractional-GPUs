@@ -231,31 +231,42 @@ static void split_node(allocator_t *ctx, node_t *node, size_t size)
 }
 
 /* 
- * Finds a node of atleast size 'size'.
- * Splits nodes if needed.
+ * Finds a node of atleast size 'size'.找到一个至少大小为'size'的节点
+ * Splits nodes if needed.如果需要的话，可以拆分节点。
+ * 目前，天真的实现在所有的空闲节点上搜索，直到找到第一个足够大的块。
  * Currently naive implementation searches over all the free nodes till first
  * sufficiently large chunk is found.
  * Returns NULL if no free node of appropriate size is found.
+ * 如果没有找到合适大小的空闲节点，则返回NULL
  */
 static node_t *get_free_node(allocator_t *ctx, size_t size)
 {
     node_t *node = NULL;
     size_t allocation_size;
 
-    /* Round up allocation size */
+    /**
+     * @brief 以alignment打倍数大小对齐分配内存
+     * 如:需要 alignment-2 字节大小的内存,则分配 alignment 字节大小的内存
+     * Round up allocation size
+     */
     allocation_size = (size + ctx->alignment - 1) & ~(ctx->alignment - 1);
 
+    /** 直到找到第一个足够大的块 
+     *  for (node= &ctx->free_list->head; node != NULL;node = node->free_link.next) */
     Q_FOREACH(node, &ctx->free_list, free_link) {
         if (node->size >= allocation_size) {
             break;
         }
     }
 
+    /** 没找到足够大打块就返回null     */
     if (!node)
         return NULL;
 
+    /** 判断所选node是否为空闲？    */
     assert(node->is_free);
-
+    
+    /** 超过所需内存大小，就切分一下    */
     if (node->size > allocation_size) {
         split_node(ctx, node, allocation_size);
     }

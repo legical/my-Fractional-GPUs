@@ -301,31 +301,43 @@
 		assert((Q_ELEM)->LINK_NAME.prev == NULL);		\
 	} while (0)
 
-/*
+/* 
+ *  构建一个迭代器块（像for块），按顺序对Q_HEAD中的每个元素进行操作 
  *  Constructs an iterator block (like a for block) that operates
  *  on each element in Q_HEAD, in order.
  *
+ *  Q_FOREACH构造了一个代码块的头部，该代码块将遍历Q_HEAD为首的队列中的每个元素。
+ *  每次循环时，由CURRENT_ELEM命名的变量将被设置为指向队列中的一个后续元素。
  *  Q_FOREACH constructs the head of a block of code that will iterate through
  *  each element in the queue headed by Q_HEAD. Each time through the loop,
  *  the variable named by CURRENT_ELEM will be set to point to a subsequent
  *  element in the queue.
- *
- *  Usage:
+ * 
+ *  使用方法Usage:
  *  Q_FOREACH(CURRENT_ELEM,Q_HEAD,LINK_NAME)
  *  {
+ *  ...对变量CURRENT_ELEM进行操作 ...
  *  ... operate on the variable CURRENT_ELEM ...
  *  }
  *
+ *  如果LINK_NAME没有被用来组织以Q_HEAD为首的队列，那么 这个宏的行为是未定义的
  *  If LINK_NAME is not used to organize the queue headed by Q_HEAD, then
  *  the behavior of this macro is undefined.
  *
- *  CURRENT_ELEM: name of the variable to use for iteration. On each
+ *  CURRENT_ELEM: 用于迭代的变量的名称。
+ *  在每次循环通过Q_FOREACH块时，CURRENT_ELEM将指向队列中的当前元素。
+ *  CURRENT_ELEM应该是一个已经定义好的变量名，其类型应该是一个指向由Q_HEAD组织的数据类型的指针
+ *  name of the variable to use for iteration. On each
  *  loop through the Q_FOREACH block, CURRENT_ELEM will point to the
  *  current element in the queue. CURRENT_ELEM should be an already-
  *  defined variable name, and its type should be a pointer to
  *  the type of data organized by Q_HEAD
- *  Q_HEAD: Pointer to the head of the queue to iterate through
- *  LINK_NAME: The name of the link used to organize the queue headed
+ * 
+ *  Q_HEAD: 通过LINK_NAME指向要迭代的队列头部的指针
+ *  Pointer to the head of the queue to iterate through
+ * 
+ *  LINK_NAME: 用于组织以Q_HEAD为首的队列的链接的名称
+ *  The name of the link used to organize the queue headed
  *  by Q_HEAD.
  */
 
