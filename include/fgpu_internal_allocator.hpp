@@ -81,6 +81,13 @@
     } while (0)
 
 /*
+ *  在以结构Q_HEAD为首的队列前面插入Q_ELEM所指向的队列元素。 
+ *  LINK_NAME标识的链接将被用来组织该元素并记录它在队列中的位置。
+ *   
+ *  Q_HEAD: 指向队列头部的指针，Q_ELEM将被插入其中。
+ *  Q_ELEM: 指向要插入队列的元素的指针
+ *  LINK_NAME。用来组织队列的链接的名称
+ * 
  *  Inserts the queue element pointed to by Q_ELEM at the front of the
  *  queue headed by the structure Q_HEAD.
  *
@@ -194,6 +201,15 @@
     (Q_ELEM)->LINK_NAME.prev
 
 /*
+ *  在队列中的元素Q_INQ之后插入队列元素Q_TOINSERT
+ *  在一个给定的元素之后插入一个元素到队列中。如果给定的元素是最后一个元素，Q_HEAD应该被适当地更新
+ * （以便Q_TOINSERT成为尾部元素）。
+ *  
+ *  Q_HEAD：Q_TOINSERT将被插入的队列的头部
+ *  Q_INQ：已经在队列中的元素
+ *  Q_TOINSERT：要插入队列的元素
+ *  LINK_NAME。 用来组织队列的链接字段的名称
+ * 
  *  Inserts the queue element Q_TOINSERT after the element Q_INQ
  *  in the queue.
  *

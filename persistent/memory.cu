@@ -99,12 +99,14 @@ struct {
 /* Does the most neccesary initialization */
 static void pre_initialization(void)
 {
+    // 当前库后的系统库中函数符号open是否存在
     g_orig_open = (orig_open_f_type)dlsym(RTLD_NEXT,"open");
     if (!g_orig_open) {
         g_init_failed = true;
         return;
     }
 
+    // 当前库后的系统库中函数符号connect是否存在
     g_orig_connect = (orig_connect_f_type)dlsym(RTLD_NEXT,"connect");
     if (!g_orig_connect) {
         g_init_failed = true;
@@ -128,6 +130,7 @@ static int init(bool do_post_init)
 {
     int ret;
 
+    // pre_initialization只执行一次
     ret = pthread_once(&g_pre_init_once, pre_initialization);
     if (ret < 0)
         return ret;
@@ -140,6 +143,7 @@ static int init(bool do_post_init)
     if (!do_post_init)
         return 0;
 
+    // NVML只执行一次初始化
     ret = pthread_once(&g_post_init_once, post_initialization);
     if (ret < 0)
         return ret;
