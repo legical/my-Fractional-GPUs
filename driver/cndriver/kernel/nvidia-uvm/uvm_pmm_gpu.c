@@ -3853,11 +3853,13 @@ NV_STATUS uvm_api_get_device_color_info(UVM_GET_DEVICE_COLOR_INFO_PARAMS *params
 
     // Bank coloring only supported on gpus
     if (uvm_uuid_is_cpu(&params->destinationUuid)) {
+        // if in cpu, error
         status = NV_ERR_INVALID_DEVICE;
         goto done;
     }
     else {
         gpu = uvm_va_space_get_gpu_by_uuid_with_gpu_va_space(va_space, &params->destinationUuid);
+        //安全性校验 check security
         if (!gpu) {
             status = NV_ERR_INVALID_DEVICE;
             goto done;

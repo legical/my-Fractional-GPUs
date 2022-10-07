@@ -284,6 +284,7 @@ static int get_device_color_info(int device, int *num_colors, size_t *max_len)
     if (ret < 0)
         return ret;
     
+    // get the number of colors present on the gpu
     ret = ioctl(g_uvm_fd, IOCTL_GET_DEVICE_COLOR_INFO, &params);
     if (ret < 0)
         return ret;
