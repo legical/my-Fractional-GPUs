@@ -46,7 +46,7 @@
 #define FGPU_DEFAULT_COLOR_MEM_SIZE     (1024 * 1024 * 1024) /* 1 GB */
 
 /* List of supported GPUs */
-static std::string supported_gpus[] = {"GeForce GTX 1070", "GeForce GTX 1080", "Tesla V100-SXM2-16GB"};
+static std::string supported_gpus[] = {"GeForce GTX 1070", "GeForce GTX 1080", "Tesla V100-SXM2-16GB", "NVIDIA GeForce RTX 3060"};
 
 /* Look into cuMemHostRegister and cuMemHostGetFlags and cuInit*/
 /*sysconf(_SC_THREAD_PROCESS_SHARED), pthread_mutexattr_setpshared
