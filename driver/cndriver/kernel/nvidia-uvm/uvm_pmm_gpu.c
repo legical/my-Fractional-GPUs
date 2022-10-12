@@ -3426,7 +3426,7 @@ static NV_STATUS reserve_color_memory(uvm_parent_gpu_t *parent_gpu, uvm_pmm_gpu_
         if (status != NV_OK)
             goto done;
 
-        // All chunks should be sequential
+        // All chunks should be sequential,所有的块应该是连续的
         UVM_ASSERT(last_address == -1 ||
                 chunk->address == last_address + chunk_size);
 
@@ -4085,6 +4085,7 @@ NV_STATUS uvm_pmm_gpu_init(uvm_pmm_gpu_t *pmm)
     /*  Fractional GPUs      */
     if (uvm_gpu_supports_coloring(gpu->parent)) {
         // Upfront reservation of all the color memory
+        // 预先保留所有颜色的内存
         status = reserve_color_memory(gpu, pmm);
         if (status != NV_OK)
             goto cleanup;

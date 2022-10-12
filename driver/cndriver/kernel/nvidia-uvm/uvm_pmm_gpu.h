@@ -254,6 +254,7 @@ struct uvm_gpu_process_color_info_struct {
     struct hlist_node link;
 
     // By which pid is this bank information sets (This is the tgid)
+    // 通过哪个 pid 设置此bank信息（这是 tgid）
     NvU32 master_pid;
 
     uvm_gpu_color_range_t *color_range;

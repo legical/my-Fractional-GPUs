@@ -161,6 +161,7 @@ void parse_args(int argc, char **argv)
     }   
 }
 
+// 是否为2的倍数
 bool is_power_of_2(size_t x)
 {
     return !(x & (x - 1));
@@ -704,6 +705,7 @@ int main(int argc, char *argv[])
     int max_bit, min_bit;
     hash_context_t *dram_hctx, *cache_hctx, *common_hctx;
 
+    // 读取命令行参数
     parse_args(argc, argv);
 
     max_bit = device_max_physical_bit();

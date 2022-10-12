@@ -225,15 +225,18 @@ int device_init(size_t req_reserved_size, size_t *reserved_size)
     int ret;
     size_t overheads = 1024 * 1024; // 1 MB
 
+    // 在共享内存里初始化FGPU需要的结构体
     ret = fgpu_init();
     if (ret < 0) {
         fprintf(stderr, "fgpu_init() failed\n");
         return ret;
     }
 
+    // 获取GPU的L2 cache大小
     gpuErrAssert(cudaGetDeviceProperties(&deviceProp, FGPU_DEVICE_NUMBER));
     l2_size = deviceProp.l2CacheSize;
 
+    // 若L2 cache大小比CACHE_LINE_SIZE还小，就是获取失败
     if (l2_size < GPU_L2_CACHE_LINE_SIZE) {
         fprintf(stderr, "Invalid value for GPU_L2_CACHE_LINE_SIZE\n");
         return -1;
@@ -243,6 +246,7 @@ int device_init(size_t req_reserved_size, size_t *reserved_size)
     if (ret < 0)
         return ret;
 
+    // 逆向工程模式下没有页着色（相当于GPU只有一个color）
     assert(num_colors == 1);
 
     /* Calculate the amount of memory that needs to be reserved */
@@ -250,6 +254,7 @@ int device_init(size_t req_reserved_size, size_t *reserved_size)
 
     /* Some reserved memroy might be used up by FGPU API. So take that as an
      * overhead.
+     * FGPU API 可能会用掉一些保留的内存,所以把它当作开销
      */
     if (reserved_size)
         *reserved_size = resv_memory - overheads;
@@ -314,6 +319,8 @@ int device_max_physical_bit(void)
 }
 
 /* 
+ * 根据cache line size，找出GPU中对哈希函数重要的最小物理位。
+ * 任何小于log2(cache_line)的位数都是不重要的。
  * Finds the minimum physical bit of GPU that matters for hash function 
  * Based on the size of cache line. Anything bit less than log2(cache_line)
  * is not of consequence

@@ -473,7 +473,7 @@ int fgpu_init(void)
     size_t page_size;
     size_t shmem_size;
 
-    /* Create the shared memory */
+    /* Create the shared memory 创建共享内存文件 读、写打开*/
     ret = shmem_fd = shm_open(FGPU_SHMEM_NAME, O_RDWR, S_IRUSR | S_IWUSR);
     if (ret < 0) {
         fprintf(stderr, "FGPU:Couldn't open shmem\n");
@@ -482,7 +482,9 @@ int fgpu_init(void)
 
     page_size = sysconf(_SC_PAGE_SIZE);
 
+    // shmem_size为sizeof(fgpu_host_ctx_t)相较于page_size整数倍大小，向上取整
     shmem_size = ROUND_UP(sizeof(fgpu_host_ctx_t), page_size);
+    // 将FGPU_SHMEM_NAME映射到共享内存中，大小为fgpu_host_ctx_t
     g_host_ctx = (fgpu_host_ctx_t *)mmap(NULL, shmem_size,
                     PROT_READ | PROT_WRITE, MAP_SHARED, shmem_fd, 0);
     if (g_host_ctx == NULL) {
@@ -490,6 +492,11 @@ int fgpu_init(void)
         ret = -errno;
         goto err;
     }
+    /**以上code用于创建一块共享内存，用于存储Host side context (g_host_ctx)
+     * g_host_ctx中的一切都被使用共享内存的进程所共享
+     * 在主机虚拟内存中固定分配，可以确保其在CPU内存中的物理位置在应用程序的整个生命周期中保持不变。
+     * 否则，操作系统可以随时自由改变主机虚拟内存的物理位置。
+    */
 
     ret = shmem_host_fd = shm_open(FGPU_SHMEM_HOST_NAME, O_RDWR, S_IRUSR | S_IWUSR);
     if (ret < 0) {
@@ -506,6 +513,9 @@ int fgpu_init(void)
         ret = -errno;
         goto err;
     }
+    /**以上code用于创建一块共享内存，用于存储fgpu_indicators_t (h_indicators)
+     * h_indicators用于标记每个persistent kernel是否成功启动
+    */
 
         cudaFree(0);
     /* 
@@ -514,11 +524,15 @@ int fgpu_init(void)
      * lazily.
      */
     shmem_size = ROUND_UP(sizeof(fgpu_indicators_t), page_size);
+    // 将h_indicators注册为锁页内存，映射到 CUDA 地址空间，可以被所有kernel访问
+    // https://blog.csdn.net/weixin_48151686/article/details/109588679
+    // https://developer.download.nvidia.com/compute/DevZone/docs/html/C/doc/html/group__CUDA__MEM_gf0a9fe11544326dabd743b7aa6b54223.html
     ret = gpuDriverErrCheck(cuMemHostRegister((void *)h_indicators, shmem_size,
                 CU_MEMHOSTREGISTER_PORTABLE | CU_MEMHOSTREGISTER_DEVICEMAP));
     if (ret < 0)
         goto err;
 
+    // 获取h_indicators映射到GPU上的内存地址
     ret = gpuErrCheck(cudaHostGetDevicePointer(&d_host_indicators,
                 (void *)h_indicators, 0));
     if (ret < 0)
