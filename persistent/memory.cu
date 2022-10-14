@@ -41,7 +41,12 @@
 #include <driver_types.h>
 
 /* NVIDIA driver */
-#include <uvm.h>
+#include <uvm_types.h>
+#include <uvm_linux_ioctl.h>
+#ifndef NVIDIA_UVM_DEVICE_NAME
+#define NVIDIA_UVM_DEVICE_NAME  "nvidia-uvm"
+#endif
+// #include <uvm.h>
 #include <nvCpuUuid.h>
 
 #include <fractional_gpu.hpp>
@@ -49,6 +54,8 @@
 
 #include <fgpu_internal_allocator.hpp>
 #include <fgpu_internal_memory.hpp>
+
+
 
 #ifdef FGPU_MEM_COLORING_ENABLED
 

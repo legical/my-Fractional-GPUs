@@ -2,6 +2,8 @@
     "files.associations": {
         "nv_uvm_types.h": "c",
         "xmemory": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "uvmtypes.h": "c",
+        "uvm_linux_ioctl.h": "c"
     }
 }
