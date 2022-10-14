@@ -1,10 +1,3 @@
-# 架构 3060
-set(TARGET sm_86)
-# NVIDIA driver驱动路径
-# set(NVIDIA_DRIVER_PATH driver/cndriver)
-set(NVIDIA_DRIVER_PATH driver/NVIDIA-Linux-x86_64-390.48)
-
-
 # TODO: Which version do we want?
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
@@ -12,6 +5,20 @@ project(fractional_gpu VERSION 1.0.1 LANGUAGES CXX CUDA DESCRIPTION "Split GPU i
 
 # Include the file contanining CMake options
 include(config.cmake.in)
+
+if(SWITCH_AMPERE)
+    # 架构 3060
+    set(TARGET sm_86)
+    # NVIDIA driver驱动路径
+    set(NVIDIA_DRIVER_PATH driver/cndriver)
+elseif()
+    # 架构 1070
+    set(TARGET sm_61)
+    # NVIDIA driver驱动路径
+    set(NVIDIA_DRIVER_PATH driver/NVIDIA-Linux-x86_64-390.48)
+endif()
+message(STATUS "GPU ARCHITECTURE = ${TARGET}")
+message(STATUS "GPU Driver Path = ${NVIDIA_DRIVER_PATH}")
 
 # Check for contraints on configurations
 

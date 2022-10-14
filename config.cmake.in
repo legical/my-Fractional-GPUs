@@ -45,3 +45,6 @@ option(FGPU_SERIALIZED_LAUNCH "As extra checks, allows only one kernel to launch
 #   FGPU_MEM_COLORING_ENABLED被禁用。
 #   FGPU_TEST_MEM_COLORING_ENABLED已启用。
 #   在此方案中，只有逆向工程代码才打算运行（一次一个逆向工程应用程序）
+
+# 是否运行在ampere架构的GPU上(3060)
+option(SWITCH_AMPERE "switch to ampere architecture" ON)
