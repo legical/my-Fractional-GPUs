@@ -8,7 +8,7 @@ option(FGPU_COMP_COLORING_ENABLE "Enable computational coloring" ON)
 # 禁用此禁用的内存带宽分区。在这种情况下，每个应用程序都利用整个 GPU 内存带宽。
 # 启用此已启用内存带宽分区。在这种情况下，每个应用程序仅使用整个 GPU 内存带宽的一小部分。
 # 目前，我们不支持没有计算分区的内存分区。
-option(FGPU_MEM_COLORING_ENABLED "Enable memory coloring" OFF)
+option(FGPU_MEM_COLORING_ENABLED "Enable memory coloring" ON)
 
 # 默认值 - 禁用。
 # 启用此功能可在使用 fgpu_memory_allocate（） API 时启用连续内存分配。
