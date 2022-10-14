@@ -41,7 +41,7 @@
 #include <driver_types.h>
 
 /* NVIDIA driver */
-#include <uvm_minimal_init.h>
+#include <uvm.h>
 #include <nvCpuUuid.h>
 
 #include <fractional_gpu.hpp>
