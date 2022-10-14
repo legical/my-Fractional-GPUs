@@ -17,8 +17,8 @@ elseif()
     # NVIDIA driver驱动路径
     set(NVIDIA_DRIVER_PATH driver/NVIDIA-Linux-x86_64-390.48)
 endif()
-message(STATUS "***** GPU ARCHITECTURE = ${TARGET} *****")
-message(STATUS "***** GPU Driver Path = ${NVIDIA_DRIVER_PATH} *****")
+message(STATUS "***** GPU Architecture = ${TARGET}")
+message(STATUS "***** GPU Driver Path = ${NVIDIA_DRIVER_PATH}")
 
 # Check for contraints on configurations
 
