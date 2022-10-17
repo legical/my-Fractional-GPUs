@@ -1906,13 +1906,13 @@ void uvm_mmu_destroy_peer_identity_mappings(uvm_gpu_t *gpu, uvm_gpu_t *peer)
 }
 
 /*  Fractional GPUs      */
-static uvm_chunk_sizes_mask_t uvm_mmu_all_user_chunk_sizes(uvm_parent_gpu_t *parent_gpu)
+static uvm_chunk_sizes_mask_t uvm_mmu_all_user_chunk_sizes(uvm_gpu_t *gpu)
 {
     // TODO: Only use color page size when need to allocate colored page
     uvm_chunk_sizes_mask_t sizes;
     
-    sizes = page_sizes_for_big_page_size(parent_gpu, UVM_PAGE_SIZE_64K)  |
-                                page_sizes_for_big_page_size(parent_gpu, UVM_PAGE_SIZE_128K) |
+    sizes = page_sizes_for_big_page_size(gpu->parent, UVM_PAGE_SIZE_64K)  |
+                                page_sizes_for_big_page_size(gpu->parent, UVM_PAGE_SIZE_128K) |
                                 PAGE_SIZE;
 
     // Although we may have to map PTEs smaller than PAGE_SIZE, user (managed)
@@ -1922,19 +1922,19 @@ static uvm_chunk_sizes_mask_t uvm_mmu_all_user_chunk_sizes(uvm_parent_gpu_t *par
     return sizes & PAGE_MASK;
 }
 
-static uvm_chunk_sizes_mask_t uvm_mmu_user_chunk_sizes(uvm_parent_gpu_t *parent_gpu)
+static uvm_chunk_sizes_mask_t uvm_mmu_user_chunk_sizes(uvm_gpu_t *gpu)
 {
     // TODO: Only use color page size when need to allocate colored page
     uvm_chunk_sizes_mask_t sizes;
     
-    sizes = page_sizes_for_big_page_size(parent_gpu, UVM_PAGE_SIZE_64K)  |
-                                page_sizes_for_big_page_size(parent_gpu, UVM_PAGE_SIZE_128K) |
+    sizes = page_sizes_for_big_page_size(gpu->parent, UVM_PAGE_SIZE_64K)  |
+                                page_sizes_for_big_page_size(gpu->parent, UVM_PAGE_SIZE_128K) |
                                 PAGE_SIZE;
 
     // If coloring is supported, force the maximum page size to be chunk size
-    if (uvm_gpu_supports_coloring(parent_gpu)) {
+    if (uvm_gpu_supports_coloring(gpu->parent)) {
 
-        sizes &= (parent_gpu->colored_allocation_chunk_size << 1) - 1;
+        sizes &= (gpu->parent->colored_allocation_chunk_size << 1) - 1;
     }
 
     // Although we may have to map PTEs smaller than PAGE_SIZE, user (managed)

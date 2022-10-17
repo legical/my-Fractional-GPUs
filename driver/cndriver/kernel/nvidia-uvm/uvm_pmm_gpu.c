@@ -3383,19 +3383,19 @@ static size_t max_reserve_color_memory_size(uvm_gpu_t *gpu)
     return s;
 }
 
-static NV_STATUS reserve_color_memory(uvm_parent_gpu_t *parent_gpu, uvm_pmm_gpu_t *pmm)
+static NV_STATUS reserve_color_memory(uvm_gpu_t *gpu, uvm_pmm_gpu_t *pmm)
 {
     int i;
     uvm_gpu_color_range_t *range;
     uvm_gpu_chunk_t *chunk;
     NvU64 last_address = -1;
     NvU64 allocated;
-    size_t chunk_size = parent_gpu->colored_allocation_chunk_size;
+    size_t chunk_size = gpu->parent->colored_allocation_chunk_size;
     size_t color;
     size_t resv_mem;
     NV_STATUS status = NV_OK;
    
-    for (i = 0; i < parent_gpu->num_allocation_mem_colors; i++) {
+    for (i = 0; i < gpu->parent->num_allocation_mem_colors; i++) {
 
         INIT_LIST_HEAD(&pmm->color_ranges_list[i]);
 
@@ -3414,7 +3414,7 @@ static NV_STATUS reserve_color_memory(uvm_parent_gpu_t *parent_gpu, uvm_pmm_gpu_
         list_add_tail(&range->list, &pmm->color_ranges_list[i]);
     }
 
-    resv_mem = max_reserve_color_memory_size(parent_gpu);
+    resv_mem = max_reserve_color_memory_size(gpu);
     
     // Reserve chunks from the GPU
     for (allocated = 0; allocated < resv_mem;
@@ -3430,7 +3430,7 @@ static NV_STATUS reserve_color_memory(uvm_parent_gpu_t *parent_gpu, uvm_pmm_gpu_
         UVM_ASSERT(last_address == -1 ||
                 chunk->address == last_address + chunk_size);
 
-        color = parent_gpu->arch_hal->phys_addr_to_allocation_color(parent_gpu, chunk->address);
+        color = gpu->parent->arch_hal->phys_addr_to_allocation_color(gpu, chunk->address);
 
         range = list_first_entry(&pmm->color_ranges_list[color],
                     uvm_gpu_color_range_t, list);
@@ -3587,7 +3587,7 @@ static NvBool can_be_colored_chunk(uvm_pmm_gpu_t *pmm,
                                     uvm_chunk_size_t chunk_size)
 {
     uvm_gpu_t *gpu = uvm_pmm_to_gpu(pmm);
-    if (!uvm_gpu_supports_coloring(gpu->parent))
+    if (!uvm_gpu_supports_coloring(gpu))
         return false;
 
     // Currently only coloring user chunks
@@ -3699,7 +3699,7 @@ static NV_STATUS get_device_color_info(uvm_pmm_gpu_t *pmm,
         NvU64 *maxLength)
 {
     uvm_gpu_t *gpu = uvm_pmm_to_gpu(pmm);
-    if (!uvm_gpu_supports_coloring(gpu->parent))
+    if (!uvm_gpu_supports_coloring(gpu))
         return NV_ERR_NOT_SUPPORTED;
 
     if (num_allocation_colors)
@@ -3812,7 +3812,7 @@ static NV_STATUS get_current_process_color_info(uvm_pmm_gpu_t *pmm, NvU32 *color
     pid_t current_pid = task_tgid_nr(current);
     uvm_gpu_t *gpu = uvm_pmm_to_gpu(pmm);
 
-    if (!uvm_gpu_supports_coloring(gpu->parent))
+    if (!uvm_gpu_supports_coloring(gpu))
         return NV_ERR_NOT_SUPPORTED;
 
     uvm_spin_lock(&pmm->list_lock);
@@ -3865,7 +3865,7 @@ NV_STATUS uvm_api_get_device_color_info(UVM_GET_DEVICE_COLOR_INFO_PARAMS *params
             goto done;
         }
 
-        if (!uvm_gpu_supports_coloring(gpu->parent)) {
+        if (!uvm_gpu_supports_coloring(gpu)) {
             status = NV_ERR_NOT_SUPPORTED;
             goto done;
         }
@@ -3899,7 +3899,7 @@ NV_STATUS uvm_api_get_process_color_info(UVM_GET_PROCESS_COLOR_INFO_PARAMS *para
             goto done;
         }
 
-        if (!uvm_gpu_supports_coloring(gpu->parent)) {
+        if (!uvm_gpu_supports_coloring(gpu)) {
             status = NV_ERR_NOT_SUPPORTED;
             goto done;
         }
@@ -3937,7 +3937,7 @@ NV_STATUS uvm_api_set_process_color_info(UVM_SET_PROCESS_COLOR_INFO_PARAMS *para
             goto done;
         }
 
-        if (!uvm_gpu_supports_coloring(gpu->parent)) {
+        if (!uvm_gpu_supports_coloring(gpu)) {
             status = NV_ERR_NOT_SUPPORTED;
             goto done;
         }
@@ -4083,7 +4083,7 @@ NV_STATUS uvm_pmm_gpu_init(uvm_pmm_gpu_t *pmm)
     }
 
     /*  Fractional GPUs      */
-    if (uvm_gpu_supports_coloring(gpu->parent)) {
+    if (uvm_gpu_supports_coloring(gpu)) {
         // Upfront reservation of all the color memory
         // 预先保留所有颜色的内存
         status = reserve_color_memory(gpu, pmm);
@@ -4134,7 +4134,7 @@ void uvm_pmm_gpu_deinit(uvm_pmm_gpu_t *pmm)
         nvUvmInterfacePmaUnregisterEvictionCallbacks(pmm->pma);
 
     /*  Fractional GPUs      */
-    if (uvm_gpu_supports_coloring(gpu->parent))
+    if (uvm_gpu_supports_coloring(gpu))
         free_reserved_color_memory(pmm);
     /* end Fractional GPUs      */
 

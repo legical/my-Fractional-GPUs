@@ -595,7 +595,7 @@ static bool uvm_mmu_page_size_supported(uvm_page_tree_t *tree, NvU32 page_size)
 /* Fractional GPUs      */
 // Returns a bitmap of allocation sizes for user memory supported by a GPU.
 // PAGE_SIZE is guaranteed to be both present and the smallest size.
-static uvm_chunk_sizes_mask_t uvm_mmu_all_user_chunk_sizes(uvm_parent_gpu_t *parent_gpu);
+static uvm_chunk_sizes_mask_t uvm_mmu_all_user_chunk_sizes(uvm_gpu_t *gpu);
 /* end Fractional GPUs      */
 
 static NvU32 uvm_mmu_biggest_page_size_up_to(uvm_page_tree_t *tree, NvU32 max_page_size)
