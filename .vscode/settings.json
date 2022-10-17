@@ -4,6 +4,8 @@
         "xmemory": "cpp",
         "*.tcc": "cpp",
         "uvmtypes.h": "c",
-        "uvm_linux_ioctl.h": "c"
+        "uvm_linux_ioctl.h": "c",
+        "fstream": "c",
+        "sstream": "c"
     }
 }

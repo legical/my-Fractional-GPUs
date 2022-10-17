@@ -3374,12 +3374,12 @@ NvU32 uvm_pmm_gpu_phys_to_virt(uvm_pmm_gpu_t *pmm, NvU64 phys_addr, NvU64 region
 }
 
 /*  Fractional GPUs      */
-static size_t max_reserve_color_memory_size(uvm_parent_gpu_t *parent_gpu)
+static size_t max_reserve_color_memory_size(uvm_gpu_t *gpu)
 {
     size_t s = ((UVM_MAX_COLOR_MEM_RESV_PERCENTAGE) * 
-        parent_gpu->vidmem_max_allocatable_address) / 100;
+        gpu->mem_info.max_allocatable_address) / 100;
     /* Round down according to the chunk size */
-    s &= ~(parent_gpu->colored_allocation_chunk_size - 1);
+    s &= ~(gpu->parent->colored_allocation_chunk_size - 1);
     return s;
 }
 

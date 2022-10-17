@@ -2194,11 +2194,22 @@ static NV_STATUS block_generic_phys_page_copy_address_get(uvm_va_block_t *block,
 
     if (block->is_linux_backed) {
         
-        UVM_ASSERT(block->cpu.pages);
-        UVM_ASSERT(block->cpu.pages[block_page.page_index]);
+        // UVM_ASSERT(block->cpu.pages);
+        // UVM_ASSERT(block->cpu.pages[block_page.page_index]);
+        // try to modify Fractional GPUs, copy from block_gpu_map_phys_all_cpu_pages
+        uvm_cpu_chunk_t *chunk;
+        NvU64 gpu_mapping_addr = uvm_cpu_chunk_get_gpu_mapping_addr(block, block_page.page_index, chunk, gpu->id);
 
-        status = uvm_gpu_map_cpu_pages(gpu, block->cpu.pages[block_page.page_index], 
-                PAGE_SIZE, &dma_address);
+        struct page *getpage;
+        getpage = uvm_cpu_chunk_get_cpu_page(block, chunk, block_page.page_index);
+        UVM_ASSERT(getpage);
+        // UVM_ASSERT_MSG(gpu_mapping_addr == 0, "GPU%u DMA address 0x%llx\n", uvm_id_value(gpu->id), gpu_mapping_addr);
+
+        status = uvm_gpu_map_cpu_pages(gpu,
+                                       getpage,
+                                       PAGE_SIZE,
+                                       &dma_address);
+                                       
         if (status != NV_OK)
             return status;
 
@@ -2304,18 +2315,18 @@ static NV_STATUS block_memcopy_begin_push(uvm_processor_id_t dst_id,
     uvm_channel_type_t channel_type;
     uvm_gpu_t *gpu;
  
-    if (src_id == UVM_CPU_ID) {
-        gpu = uvm_gpu_get(dst_id);
+    if (uvm_id_equal(src_id, UVM_ID_CPU)) {
+        gpu = uvm_gpu_get_by_processor_id(dst_id);
         channel_type = UVM_CHANNEL_TYPE_CPU_TO_GPU;
     }
-    else if (dst_id == UVM_CPU_ID) {
-        gpu = uvm_gpu_get(src_id);
+    else if (uvm_id_equal(dst_id, UVM_ID_CPU)) {
+        gpu = uvm_gpu_get_by_processor_id(src_id);
         channel_type = UVM_CHANNEL_TYPE_GPU_TO_CPU;
     }
     else {
-        UVM_ASSERT(src_id == dst_id);
+        UVM_ASSERT(uvm_id_equal(src_id, dst_id));
 
-        gpu = uvm_gpu_get(src_id);
+        gpu = uvm_gpu_get_by_processor_id(src_id);
 
         channel_type = UVM_CHANNEL_TYPE_GPU_INTERNAL;
     }
@@ -3013,8 +3024,8 @@ NV_STATUS block_copy_colored_pages_between(uvm_va_block_t *src_block,
             length = min(src_page_leftover, dest_page_leftover);
             UVM_ASSERT(src_region->length == dest_region->length);
 
-            uvm_push_set_flag(&push, UVM_PUSH_FLAG_CE_NEXT_MEMBAR_NONE);
-            copying_gpu->ce_hal->memcopy(&push, dest_address, src_address, length);
+            uvm_push_set_flag(&push, UVM_PUSH_FLAG_NEXT_MEMBAR_NONE);
+            copying_gpu->parent->ce_hal->memcopy(&push, dest_address, src_address, length);
         }
         
         src_region->page_offset = (src_region->page_offset + length) & (PAGE_SIZE - 1);
@@ -3099,7 +3110,7 @@ NV_STATUS block_memset_colored_pages(uvm_va_block_t *block,
 
         if (!gpu) {
 
-            gpu = uvm_gpu_get(id);
+            gpu = uvm_gpu_get_by_processor_id(id);
 
             status = uvm_push_begin_acquire(gpu->channel_manager, 
                                             UVM_CHANNEL_TYPE_GPU_INTERNAL,
@@ -3155,7 +3166,7 @@ NV_STATUS block_memset_colored_pages(uvm_va_block_t *block,
 
             address.address += page_offset;
 
-            uvm_push_set_flag(&push, UVM_PUSH_FLAG_CE_NEXT_MEMBAR_NONE);
+            uvm_push_set_flag(&push, UVM_PUSH_FLAG_NEXT_MEMBAR_NONE);
 
             gpu->parent->ce_hal->memset_1(&push, address, value, length);
         }
