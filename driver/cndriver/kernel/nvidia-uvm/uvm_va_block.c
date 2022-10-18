@@ -2196,12 +2196,9 @@ static NV_STATUS block_generic_phys_page_copy_address_get(uvm_va_block_t *block,
         
         // UVM_ASSERT(block->cpu.pages);
         // UVM_ASSERT(block->cpu.pages[block_page.page_index]);
-        // try to modify Fractional GPUs, copy from block_gpu_map_phys_all_cpu_pages
-        uvm_cpu_chunk_t *chunk;
-        NvU64 gpu_mapping_addr = uvm_cpu_chunk_get_gpu_mapping_addr(block, block_page.page_index, chunk, gpu->id);
-
-        struct page *getpage;
-        getpage = uvm_cpu_chunk_get_cpu_page(block, chunk, block_page.page_index);
+        // try to modify Fractional GPUs, copy from line10250
+        uvm_cpu_chunk_t *chunk = uvm_cpu_chunk_get_chunk_for_page(block, block_page.page_index);
+        struct page *getpage = uvm_cpu_chunk_get_cpu_page(block, chunk, block_page.page_index);
         UVM_ASSERT(getpage);
         // UVM_ASSERT_MSG(gpu_mapping_addr == 0, "GPU%u DMA address 0x%llx\n", uvm_id_value(gpu->id), gpu_mapping_addr);
 
@@ -5901,7 +5898,7 @@ static void block_gpu_compute_new_pte_state(uvm_va_block_t *block,
 
     /*  Fractional GPUs      */
     // Incase coloring requires use of 4K page size, force the page size.
-    if (uvm_gpu_supports_coloring(gpu->parent) &&
+    if (uvm_gpu_supports_coloring(gpu) &&
             gpu->parent->colored_allocation_chunk_size == UVM_PAGE_SIZE_4K)
         return;
     /* end Fractional GPUs      */
