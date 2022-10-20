@@ -516,6 +516,7 @@ static void uvm_block_iter_deinitialization(uvm_block_iter_t *iter)
         if (iter->cpu_block->cpu.pages) {
 
             // Release all pinned pages if any
+            // need to find all pages of va_block
             for (i = 0; i < PAGES_PER_UVM_VA_BLOCK; i++) {
                 page = iter->cpu_block->cpu.pages[i];
                 if (page) {
