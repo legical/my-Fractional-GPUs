@@ -153,6 +153,36 @@ Apart from this README, the following text files exist to help new developers:
 * **[doc/TODO.md](doc/TODO.md)**           
     * This file contains a wish-list of features/issues to be added/solved.
 
+## Ready for running
+### Install nvidia driver firstly
+```
+cd $PROJ_DIR/driver/NVIDIA-Linux-x86_64-390.48
+sudo chmod +x nvidia-installer
+sudo ./nvidia-installer
+```
+
+### Nvdia driver env
+```
+sudo nano ~/.bashrc
+
+# add these in file bottom
+# cuda env
+export CUDA_HOME=/usr/local/cuda-9.1
+export PATH=${CUDA_HOME}/bin:${PATH}
+export LIBRARY_PATH=${CUDA_HOME}/lib64:$LIBRARY_PATH
+export LD_LIBRARY_PATH=${CUDA_HOME}/lib64:$LD_LIBRARY_PATH
+```
+
+### Cuda lib
+>Get error like this: loading shared libraries: libcudart.so.9.1: cannot open shared object file: No such file
+
+Do these works:
+```
+sudo cp /usr/local/cuda-9.1/lib64/libcudart.so.9.1 /usr/local/lib/libcudart.so.9.1 && sudo ldconfig
+sudo cp /usr/local/cuda-9.1/lib64/libcublas.so.9.1 /usr/local/lib/libcublas.so.9.1 && sudo ldconfig
+sudo cp /usr/local/cuda-9.1/lib64/libcurand.so.9.1 /usr/local/lib/libcurand.so.9.1 && sudo ldconfig
+```
+
 ## Help! Too many document and I am impatient!
 
 For a quick demo, first setup your system according to *SETUP* section of 

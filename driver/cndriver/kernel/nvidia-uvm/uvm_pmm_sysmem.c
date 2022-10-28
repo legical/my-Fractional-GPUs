@@ -550,6 +550,24 @@ uvm_cpu_chunk_t *uvm_cpu_chunk_get_chunk_for_page(uvm_va_block_t *va_block, uvm_
     return ((uvm_cpu_chunk_t **)va_block->cpu.chunks)[page_index];
 }
 
+// remove page of va_block chunk==page
+void uvm_cpu_page_remove_from_block(uvm_va_block_t *va_block, uvm_cpu_chunk_t *chunk, uvm_page_index_t page_index)
+{
+    // get and page
+    struct page *page = uvm_cpu_chunk_get_cpu_page(va_block, chunk, page_index);
+    
+    // judge valid
+    UVM_ASSERT(uvm_page_mask_test(&va_block->cpu.allocated, page_index));
+    UVM_ASSERT(((uvm_cpu_chunk_t **)va_block->cpu.chunks)[page_index] != NULL);
+
+    // release page
+    put_page(page);
+
+    // release chunk
+    ((uvm_cpu_chunk_t **)va_block->cpu.chunks)[page_index] = NULL;
+    uvm_page_mask_clear(&va_block->cpu.allocated, page_index);
+}
+
 NV_STATUS uvm_cpu_chunk_alloc(uvm_va_block_t *va_block,
                               uvm_page_index_t page_index,
                               struct mm_struct *mm,
@@ -1084,6 +1102,22 @@ uvm_cpu_chunk_t *uvm_cpu_chunk_get_chunk_for_page(uvm_va_block_t *va_block, uvm_
 
     UVM_ASSERT(chunk);
     return chunk;
+}
+
+// remove page of va_block chunk!=page
+void uvm_cpu_page_remove_from_block(uvm_va_block_t *va_block, uvm_cpu_chunk_t *chunk, uvm_page_index_t page_index)
+{        
+    uvm_va_block_region_t chunk_region;
+
+    // judge valid
+    UVM_ASSERT(chunk);
+    UVM_ASSERT(chunk->page);
+    chunk_region = uvm_va_block_chunk_region(va_block, uvm_cpu_chunk_get_size(chunk), page_index);
+    struct page *page = chunk->page + (page_index - chunk_region.first);
+
+    // release page
+    put_page(page);
+    *page = NULL;
 }
 
 NV_STATUS uvm_cpu_chunk_alloc(uvm_va_block_t *va_block,

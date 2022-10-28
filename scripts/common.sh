@@ -1,5 +1,5 @@
 # Get this script's path
-SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+SCRIPTPATH="$(cd "$(dirname "$0")" ; pwd -P)"
 
 # Change the display manager depending on the system
 DISPLAY_MANAGER="lightdm"
@@ -131,17 +131,21 @@ build_and_install_fgpu() {
     # Install driver
     # Need to first kill display manager that might be using the GPU
     # Basically the driver installation requires Xorg to not be running
-    sudo service $DISPLAY_MANAGER stop &> /dev/null
-    sudo pkill -9 Xorg
+    sudo init 1
+    sudo service $DISPLAY_MANAGER stop &> /dev/null    
 
     # In normal scenarios, the default options should be fine so no need to
     # prompt user for inputs
     cd $DRIVER_PATH
-    sudo $DRIVER_INSTALL_PATH --silent
+    # sudo $DRIVER_INSTALL_PATH --silent
+    sudo $DRIVER_INSTALL_PATH
 
     if [ $? -ne 0 ]; then
         do_error_exit "Couldn't install driver"
     fi
+
+    sudo init 6
+    sudo service $DISPLAY_MANAGER start &> /dev/null
 
     cd $cur_dir
 }

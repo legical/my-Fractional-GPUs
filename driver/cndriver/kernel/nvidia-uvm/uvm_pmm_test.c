@@ -235,8 +235,8 @@ static NV_STATUS chunk_alloc_user_check(uvm_pmm_gpu_t *pmm,
 
     // status = uvm_pmm_gpu_alloc(pmm, num_chunks, chunk_size, mem_type, flags, chunks, &local_tracker);
     /*  Fractional GPUs      */
-    status = uvm_pmm_gpu_alloc_user(pmm, num_chunks, chunk_size, flags, UVM_PMM_INVALID_TGID,
-        chunks, &local_tracker);
+    status = uvm_pmm_gpu_alloc_user(pmm, num_chunks, chunk_size, flags, UVM_PMM_INVALID_TGID, 
+                                    chunks, &local_tracker);
     /* end Fractional GPUs      */
     if (status != NV_OK)
         return status;
@@ -1365,12 +1365,7 @@ static NV_STATUS test_chunk_with_elevated_page(uvm_gpu_t *gpu)
 
     // Allocate a root chunk then split it to test multiple mappings across
     // contiguous chunks under the same root.
-    TEST_NV_CHECK_GOTO(uvm_pmm_gpu_alloc_user(pmm,
-                                              1,
-                                              UVM_CHUNK_SIZE_MAX,
-                                              UVM_PMM_ALLOC_FLAGS_EVICT,
-                                              &parent_chunk,
-                                              NULL), out);
+    TEST_NV_CHECK_GOTO(uvm_pmm_gpu_alloc_user(pmm,1,UVM_CHUNK_SIZE_MAX,UVM_PMM_ALLOC_FLAGS_EVICT,UVM_PMM_INVALID_TGID,&parent_chunk,NULL), out);
 
     // Keep an extra reference to just one page within the parent chunk.
     // This will make the whole root chunk non-allocatable.

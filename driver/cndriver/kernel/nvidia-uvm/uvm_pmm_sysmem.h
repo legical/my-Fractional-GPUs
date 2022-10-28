@@ -302,6 +302,9 @@ void uvm_cpu_chunk_remove_from_block(uvm_va_block_t *va_block, uvm_cpu_chunk_t *
 // NULL is returned.
 uvm_cpu_chunk_t *uvm_cpu_chunk_get_chunk_for_page(uvm_va_block_t *block, uvm_page_index_t page_index);
 
+// Remove a CPU page from the va_block's storage structures.
+void uvm_cpu_page_remove_from_block(uvm_va_block_t *va_block, uvm_cpu_chunk_t *chunk, uvm_page_index_t page_index);
+
 // Return the physical size of the CPU chunk.
 // The physical size of the CPU chunk is the size of the physical CPU
 // memory backing the CPU chunk. It is set at CPU chunk allocation time
