@@ -687,7 +687,6 @@ NV_STATUS uvm_update_va_colored_block_region(uvm_va_block_t *va_block,
     if (UVM_ID_IS_CPU(id)) {
         int ret;
         uvm_page_index_t i;
-        struct page *page;
         //modify 
         uvm_cpu_chunk_t *chunk;
 
@@ -712,7 +711,7 @@ NV_STATUS uvm_update_va_colored_block_region(uvm_va_block_t *va_block,
                 // }
                 if (chunk) {
                     // put_page(page);
-                    uvm_cpu_page_remove_from_block(iter->cpu_block, chunk, i);
+                    uvm_cpu_page_remove_from_block(va_block, chunk, i);
                 }
             }
 
@@ -1177,7 +1176,8 @@ static NV_STATUS uvm_memcpy_colored(uvm_va_space_t *va_space,
 {
     NV_STATUS status = NV_OK;
 
-    uvm_assert_mmap_sem_locked(&current->mm->mmap_lock);
+    // uvm_assert_mmap_sem_locked(&current->mm->mmap_lock);
+    uvm_assert_mmap_lock_locked(current->mm);
     uvm_assert_rwsem_locked(&va_space->lock);
 
     // TODO: Populate pages and map them
@@ -1206,7 +1206,7 @@ static NV_STATUS uvm_memset_colored(uvm_va_space_t *va_space,
 {
     NV_STATUS status = NV_OK;
 
-    uvm_assert_mmap_sem_locked(&current->mm->mmap_lock);
+    uvm_assert_mmap_lock_locked(current->mm);
     uvm_assert_rwsem_locked(&va_space->lock);
 
     // TODO: Populate pages and map them
@@ -1548,7 +1548,7 @@ NV_STATUS uvm_api_memcpy_colored(UVM_MEMCPY_COLORED_PARAMS *params, struct file 
 
     // mmap_sem will be needed if we have to create CPU mappings
     // uvm_down_read_mmap_sem(&current->mm->mmap_lock);
-    uvm_down_read_mmap_lock(&current->mm);
+    uvm_down_read_mmap_lock(current->mm);
     uvm_va_space_down_read(va_space);
 
     if (uvm_uuid_is_cpu(&params->srcUuid)) {
@@ -1614,7 +1614,7 @@ done:
     //       pass pushes all GPU work asynchronously, second pass updates CPU
     //       mappings synchronously).
     // uvm_up_read_mmap_sem_out_of_order(&current->mm->mmap_lock);
-    uvm_up_read_mmap_lock_out_of_order(&current->mm);
+    uvm_up_read_mmap_lock_out_of_order(current->mm);
 
     // There was an error or we are sync. Even if there was an error, we
     // need to wait for work already dispatched to complete. Waiting on
@@ -1644,7 +1644,7 @@ NV_STATUS uvm_api_memset_colored(UVM_MEMSET_COLORED_PARAMS *params, struct file 
 
     // mmap_sem will be needed if we have to create CPU mappings
     // uvm_down_read_mmap_sem(&current->mm->mmap_lock);
-    uvm_down_read_mmap_lock(&current->mm);
+    uvm_down_read_mmap_lock(current->mm);
     uvm_va_space_down_read(va_space);
 
     // Only GPU are supported (CPU can use memset() in userspace)
@@ -1681,7 +1681,7 @@ done:
     //       pass pushes all GPU work asynchronously, second pass updates CPU
     //       mappings synchronously).
     // uvm_up_read_mmap_sem_out_of_order(&current->mm->mmap_lock);
-    uvm_up_read_mmap_lock_out_of_order(&current->mm);
+    uvm_up_read_mmap_lock_out_of_order(current->mm);
 
     // There was an error or we are sync. Even if there was an error, we
     // need to wait for work already dispatched to complete. Waiting on
