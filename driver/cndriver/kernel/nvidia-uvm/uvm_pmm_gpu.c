@@ -3709,7 +3709,7 @@ static NV_STATUS get_device_color_info(uvm_pmm_gpu_t *pmm,
         *num_transfer_colors = gpu->parent->num_transfer_mem_colors;
 
     if (maxLength)
-        *maxLength = max_reserve_color_memory_size(gpu->parent);
+        *maxLength = max_reserve_color_memory_size(gpu);
 
     return NV_OK;
 }
