@@ -337,10 +337,14 @@ static uvm_hal_class_ops_t arch_table[] =
             .mmu_engine_id_to_type = uvm_hal_ampere_mmu_engine_id_to_type,
             .mmu_client_id_to_utlb_id = uvm_hal_ampere_mmu_client_id_to_utlb_id,
             /*  Fractional GPUs      */
-            .phys_addr_to_allocation_color = uvm_hal_ampere_mmu_phys_addr_to_allocation_color,
-            .phys_addr_to_transfer_color = uvm_hal_ampere_mmu_phys_addr_to_transfer_color,
-            .phys_addr_to_base_transfer_color_addr = uvm_hal_ampere_mmu_phys_addr_to_base_transfer_color_addr,
-            .phys_addr_to_transfer_color_idx = uvm_hal_ampere_mmu_phys_addr_to_transfer_color_idx,
+            .phys_addr_to_allocation_color = uvm_hal_volta_mmu_phys_addr_to_allocation_color,
+            .phys_addr_to_transfer_color = uvm_hal_volta_mmu_phys_addr_to_transfer_color,
+            .phys_addr_to_base_transfer_color_addr = uvm_hal_volta_mmu_phys_addr_to_base_transfer_color_addr,
+            .phys_addr_to_transfer_color_idx = uvm_hal_volta_mmu_phys_addr_to_transfer_color_idx,
+            // .phys_addr_to_allocation_color = uvm_hal_ampere_mmu_phys_addr_to_allocation_color,
+            // .phys_addr_to_transfer_color = uvm_hal_ampere_mmu_phys_addr_to_transfer_color,
+            // .phys_addr_to_base_transfer_color_addr = uvm_hal_ampere_mmu_phys_addr_to_base_transfer_color_addr,
+            // .phys_addr_to_transfer_color_idx = uvm_hal_ampere_mmu_phys_addr_to_transfer_color_idx,
             /* end Fractional GPUs      */
         },
     },

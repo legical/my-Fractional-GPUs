@@ -274,6 +274,82 @@ uvm_mmu_mode_hal_t *uvm_hal_mmu_mode_volta(NvU32 big_page_size)
     return &volta_mmu_mode_hal;
 }
 
+/*  Fractional GPUs      */
+static NvU32 uvm_hal_volta_mmu_phys_addr_to_true_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
+{
+    NvU32 color;
+    bool bit0;
+
+    UVM_ASSERT(uvm_gpu_supports_coloring(parent_gpu));
+
+    //Cache Vertically Split
+    //bit0 = ((phys_addr >> 12) ^ (phys_addr >> 15) ^ (phys_addr >> 16) ^ 
+    //        (phys_addr >> 18) ^ (phys_addr >> 20) ^ (phys_addr >> 21) ^ 
+    //        (phys_addr >> 23) ^ (phys_addr >> 26) ^ (phys_addr >> 28) ^ 
+    //        (phys_addr >> 29) ^ (phys_addr & 30) & 0x1;
+
+    bit0 = hweight_long((NvU32)(phys_addr >> 12) & 0x74b59) & 0x1;
+    color = bit0;
+
+    // Transfer color represent the true number of total colors
+    UVM_ASSERT(color < parent_gpu->num_transfer_mem_colors);
+
+    return color;
+}
+
+NvU32 uvm_hal_volta_mmu_phys_addr_to_allocation_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
+{
+    // uvm_gpu_t *gpu;
+    UVM_ASSERT(uvm_gpu_supports_coloring(gpu));
+
+    if (parent_gpu->num_allocation_mem_colors == 1)
+        return 0;
+
+    return uvm_hal_volta_mmu_phys_addr_to_true_color(gpu, phys_addr);
+}
+
+
+NvU32 uvm_hal_volta_mmu_phys_addr_to_transfer_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
+{
+    // uvm_gpu_t *gpu;
+    UVM_ASSERT(uvm_gpu_supports_coloring(parent_gpu));
+
+    if (parent_gpu->num_transfer_mem_colors == 1)
+        return 0;
+
+    return uvm_hal_volta_mmu_phys_addr_to_true_color(parent_gpu, phys_addr);
+}
+
+
+// Returns common address for all the physical page addresses of different colors with
+// same page index
+NvU64 uvm_hal_volta_mmu_phys_addr_to_base_transfer_color_addr(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
+{
+    // uvm_gpu_t *gpu = gpu;
+    UVM_ASSERT(uvm_gpu_supports_coloring(parent_gpu));
+
+    // Number of transfer colors must be power of 2
+    UVM_ASSERT(1 << order_base_2(parent_gpu->num_transfer_mem_colors) == parent_gpu->num_transfer_mem_colors);
+
+    if (parent_gpu->num_transfer_mem_colors == 1)
+        return phys_addr;
+
+    return phys_addr & ~((1UL << (order_base_2(parent_gpu->colored_transfer_chunk_size * parent_gpu->num_transfer_mem_colors))) - 1);
+}
+
+NvU64 uvm_hal_volta_mmu_phys_addr_to_transfer_color_idx(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
+{
+    // uvm_gpu_t *gpu = gpu;
+    UVM_ASSERT(uvm_gpu_supports_coloring(parent_gpu));
+
+    // Number of transfer colors must be power of 2
+    UVM_ASSERT(1 << order_base_2(parent_gpu->num_transfer_mem_colors) == parent_gpu->num_transfer_mem_colors);
+
+    return uvm_hal_volta_mmu_phys_addr_to_base_transfer_color_addr(parent_gpu, phys_addr) >> 
+        (order_base_2(parent_gpu->colored_transfer_chunk_size * parent_gpu->num_transfer_mem_colors));
+}
+/* end Fractional GPUs      */
+
 uvm_mmu_engine_type_t uvm_hal_volta_mmu_engine_id_to_type(NvU16 mmu_engine_id)
 {
     if (mmu_engine_id >= NV_PFAULT_MMU_ENG_ID_HOST0 && mmu_engine_id <= NV_PFAULT_MMU_ENG_ID_HOST13)

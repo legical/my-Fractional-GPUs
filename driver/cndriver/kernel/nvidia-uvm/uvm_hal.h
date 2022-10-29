@@ -392,10 +392,10 @@ typedef uvm_mmu_mode_hal_t *(*uvm_hal_lookup_mode_hal_t)(NvU32 big_page_size);
 typedef void (*uvm_hal_mmu_enable_prefetch_faults_t)(uvm_parent_gpu_t *parent_gpu);
 typedef void (*uvm_hal_mmu_disable_prefetch_faults_t)(uvm_parent_gpu_t *parent_gpu);
 /* Fractional GPUs      */
-typedef NvU32 (*uvm_hal_mmu_phys_addr_to_allocation_color)(uvm_gpu_t *gpu, NvU64 phys_addr);
-typedef NvU32 (*uvm_hal_mmu_phys_addr_to_transfer_color)(uvm_gpu_t *gpu, NvU64 phys_addr);
-typedef NvU64 (*uvm_hal_mmu_phys_addr_to_base_transfer_color_addr)(uvm_gpu_t *gpu, NvU64 phys_addr);
-typedef NvU64 (*uvm_hal_mmu_phys_addr_to_transfer_color_idx)(uvm_gpu_t *gpu, NvU64 phys_addr);
+typedef NvU32 (*uvm_hal_mmu_phys_addr_to_allocation_color)(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+typedef NvU32 (*uvm_hal_mmu_phys_addr_to_transfer_color)(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+typedef NvU64 (*uvm_hal_mmu_phys_addr_to_base_transfer_color_addr)(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+typedef NvU64 (*uvm_hal_mmu_phys_addr_to_transfer_color_idx)(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
 /* end Fractional GPUs      */
 uvm_mmu_mode_hal_t *uvm_hal_mmu_mode_maxwell(NvU32 big_page_size);
 uvm_mmu_mode_hal_t *uvm_hal_mmu_mode_pascal(NvU32 big_page_size);
@@ -409,6 +409,16 @@ void uvm_hal_maxwell_mmu_enable_prefetch_faults_unsupported(uvm_parent_gpu_t *pa
 void uvm_hal_maxwell_mmu_disable_prefetch_faults_unsupported(uvm_parent_gpu_t *parent_gpu);
 void uvm_hal_pascal_mmu_enable_prefetch_faults(uvm_parent_gpu_t *parent_gpu);
 void uvm_hal_pascal_mmu_disable_prefetch_faults(uvm_parent_gpu_t *parent_gpu);
+/*  Fractional GPUs      */
+NvU32 uvm_hal_pascal_mmu_phys_addr_to_allocation_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+NvU32 uvm_hal_pascal_mmu_phys_addr_to_transfer_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+NvU64 uvm_hal_pascal_mmu_phys_addr_to_base_transfer_color_addr(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+NvU64 uvm_hal_pascal_mmu_phys_addr_to_transfer_color_idx(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+NvU32 uvm_hal_volta_mmu_phys_addr_to_allocation_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+NvU32 uvm_hal_volta_mmu_phys_addr_to_transfer_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+NvU64 uvm_hal_volta_mmu_phys_addr_to_base_transfer_color_addr(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+NvU64 uvm_hal_volta_mmu_phys_addr_to_transfer_color_idx(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr);
+/* end Fractional GPUs      */
 
 // Convert a faulted MMU engine ID to a UVM engine type. Only engines which have
 // faults serviced by UVM are handled. On Pascal the only such engine is
@@ -429,19 +439,10 @@ NvU16 uvm_hal_volta_mmu_client_id_to_utlb_id(NvU16 client_id);
 NvU16 uvm_hal_ampere_mmu_client_id_to_utlb_id(NvU16 client_id);
 
 /*  Fractional GPUs      */
-NvU32 uvm_hal_pascal_mmu_phys_addr_to_allocation_color(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU32 uvm_hal_pascal_mmu_phys_addr_to_transfer_color(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU64 uvm_hal_pascal_mmu_phys_addr_to_base_transfer_color_addr(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU64 uvm_hal_pascal_mmu_phys_addr_to_transfer_color_idx(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU32 uvm_hal_volta_mmu_phys_addr_to_allocation_color(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU32 uvm_hal_volta_mmu_phys_addr_to_transfer_color(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU64 uvm_hal_volta_mmu_phys_addr_to_base_transfer_color_addr(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU64 uvm_hal_volta_mmu_phys_addr_to_transfer_color_idx(uvm_gpu_t *gpu, NvU64 phys_addr);
-
-NvU32 uvm_hal_ampere_mmu_phys_addr_to_allocation_color(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU32 uvm_hal_ampere_mmu_phys_addr_to_transfer_color(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU64 uvm_hal_ampere_mmu_phys_addr_to_base_transfer_color_addr(uvm_gpu_t *gpu, NvU64 phys_addr);
-NvU64 uvm_hal_ampere_mmu_phys_addr_to_transfer_color_idx(uvm_gpu_t *gpu, NvU64 phys_addr);
+// NvU32 uvm_hal_ampere_mmu_phys_addr_to_allocation_color(uvm_gpu_t *gpu, NvU64 phys_addr);
+// NvU32 uvm_hal_ampere_mmu_phys_addr_to_transfer_color(uvm_gpu_t *gpu, NvU64 phys_addr);
+// NvU64 uvm_hal_ampere_mmu_phys_addr_to_base_transfer_color_addr(uvm_gpu_t *gpu, NvU64 phys_addr);
+// NvU64 uvm_hal_ampere_mmu_phys_addr_to_transfer_color_idx(uvm_gpu_t *gpu, NvU64 phys_addr);
 /* end Fractional GPUs      */
 
 // Replayable faults

@@ -1385,6 +1385,17 @@ static bool uvm_gpu_supports_coloring(uvm_gpu_t *gpu)
         return false;
     return true;
 }
+
+static bool uvm_gpu_supports_coloring(uvm_parent_gpu_t *parent_gpu)
+{
+    // If coloring is not supported, both types of colors should be zero.
+    UVM_ASSERT((parent_gpu->num_allocation_mem_colors == 0) ==
+        (parent_gpu->num_transfer_mem_colors == 0));
+
+    if (parent_gpu->num_allocation_mem_colors == 0)
+        return false;
+    return true;
+}
 /* end Fractional GPUs      */
 
 // Returns addr's canonical form for host systems that use canonical form
