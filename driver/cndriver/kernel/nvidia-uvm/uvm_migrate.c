@@ -1613,7 +1613,8 @@ done:
     //       benchmarks to see if a two-pass approach would be faster (first
     //       pass pushes all GPU work asynchronously, second pass updates CPU
     //       mappings synchronously).
-    uvm_up_read_mmap_sem_out_of_order(&current->mm->mmap_lock);
+    // uvm_up_read_mmap_sem_out_of_order(&current->mm->mmap_lock);
+    uvm_up_read_mmap_lock_out_of_order(&current->mm);
 
     // There was an error or we are sync. Even if there was an error, we
     // need to wait for work already dispatched to complete. Waiting on
@@ -1679,7 +1680,8 @@ done:
     //       benchmarks to see if a two-pass approach would be faster (first
     //       pass pushes all GPU work asynchronously, second pass updates CPU
     //       mappings synchronously).
-    uvm_up_read_mmap_sem_out_of_order(&current->mm->mmap_lock);
+    // uvm_up_read_mmap_sem_out_of_order(&current->mm->mmap_lock);
+    uvm_up_read_mmap_lock_out_of_order(&current->mm);
 
     // There was an error or we are sync. Even if there was an error, we
     // need to wait for work already dispatched to complete. Waiting on
