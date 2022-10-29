@@ -2327,14 +2327,14 @@ static NV_STATUS block_memcopy_begin_push(uvm_processor_id_t dst_id,
 
         channel_type = UVM_CHANNEL_TYPE_GPU_INTERNAL;
     }
-
+    
     return uvm_push_begin_acquire(gpu->channel_manager,
                                   channel_type,
                                   NULL,
                                   push,
                                   "Copy from %s to %s",
-                                  uvm_processor_name(src_id),
-                                  uvm_processor_name(dst_id));
+                                  uvm_gpu_name(uvm_gpu_get_by_processor_id(src_id)),
+                                  uvm_gpu_name(uvm_gpu_get_by_processor_id(dst_id)));
 }
 /* end Fractional GPUs      */
 
@@ -2661,7 +2661,9 @@ static NV_STATUS block_copy_resident_pages_between(uvm_va_block_t *block,
             uvm_tools_record_block_migration_begin(block, &push, dst_id, src_id, page_start, cause);
         }
         else {
-            uvm_push_set_flag(&push, UVM_PUSH_FLAG_CE_NEXT_PIPELINED);
+            uvm_push_flag_t push_flag = UVM_PUSH_FLAG_CE_NEXT_PIPELINED;
+            // uvm_push_set_flag(&push, UVM_PUSH_FLAG_CE_NEXT_PIPELINED);
+            uvm_push_set_flag(&push, push_flag);
         }
 
         block_update_page_dirty_state(block, dst_id, src_id, page_index);
@@ -2906,12 +2908,12 @@ NV_STATUS block_copy_colored_pages_between(uvm_va_block_t *src_block,
         if (!copying_gpu) {
 
             // Can't be two different GPUs. Not supported yet.
-            UVM_ASSERT(src_id == UVM_CPU_ID || dest_id == UVM_CPU_ID || src_id == dest_id);
+            UVM_ASSERT(UVM_ID_IS_CPU(src_id) || UVM_ID_IS_CPU(dest_id) || uvm_id_equal(src_id, dest_id));
 
             // Need to map CPU pages on GPU if not already done
-            if (src_id == UVM_CPU_ID && !src_block->is_linux_backed) {
+            if (UVM_ID_IS_CPU(src_id) && !src_block->is_linux_backed) {
 
-                gpu = uvm_gpu_get(dest_id);
+                gpu = uvm_gpu_get_by_processor_id(dest_id);
 
                 gpu_state = block_gpu_state_get_alloc(src_block, gpu);
                 if (!gpu_state) {
@@ -2920,9 +2922,9 @@ NV_STATUS block_copy_colored_pages_between(uvm_va_block_t *src_block,
                 }
             }
 
-            if (dest_id == UVM_CPU_ID && !dest_block->is_linux_backed) {
+            if (UVM_ID_IS_CPU(dest_id) && !dest_block->is_linux_backed) {
 
-                gpu = uvm_gpu_get(src_id); 
+                gpu = uvm_gpu_get_by_processor_id(src_id); 
 
                 gpu_state = block_gpu_state_get_alloc(dest_block, gpu);
                 if (!gpu_state) {

@@ -1547,7 +1547,8 @@ NV_STATUS uvm_api_memcpy_colored(UVM_MEMCPY_COLORED_PARAMS *params, struct file 
     NV_STATUS tracker_status = NV_OK;
 
     // mmap_sem will be needed if we have to create CPU mappings
-    uvm_down_read_mmap_sem(&current->mm->mmap_lock);
+    // uvm_down_read_mmap_sem(&current->mm->mmap_lock);
+    uvm_down_read_mmap_lock(&current->mm);
     uvm_va_space_down_read(va_space);
 
     if (uvm_uuid_is_cpu(&params->srcUuid)) {
@@ -1575,7 +1576,8 @@ NV_STATUS uvm_api_memcpy_colored(UVM_MEMCPY_COLORED_PARAMS *params, struct file 
     }
 
     // Either atmost one src/dest lie on CPU or both lie on same GPU
-    // Invalid configuration: Both lie on CPU or different GPUs    
+    // Invalid configuration: Both lie on CPU or different GPUs   
+    // if ((!src_gpu && !dest_gpu) || (src_gpu && dest_gpu && src_gpu->id != dest_gpu->id)) { 
     if ((!src_gpu && !dest_gpu) || (src_gpu && dest_gpu && !uvm_id_equal(src_gpu->id, dest_gpu->id))) {
     	status = NV_ERR_INVALID_DEVICE;
         goto done;
@@ -1640,7 +1642,8 @@ NV_STATUS uvm_api_memset_colored(UVM_MEMSET_COLORED_PARAMS *params, struct file 
     NV_STATUS tracker_status = NV_OK;
 
     // mmap_sem will be needed if we have to create CPU mappings
-    uvm_down_read_mmap_sem(&current->mm->mmap_lock);
+    // uvm_down_read_mmap_sem(&current->mm->mmap_lock);
+    uvm_down_read_mmap_lock(&current->mm);
     uvm_va_space_down_read(va_space);
 
     // Only GPU are supported (CPU can use memset() in userspace)
