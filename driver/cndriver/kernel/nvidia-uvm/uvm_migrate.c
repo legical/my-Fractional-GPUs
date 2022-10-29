@@ -745,7 +745,7 @@ NV_STATUS uvm_update_va_colored_block_region(uvm_va_block_t *va_block,
 
         for (i = first; i < outer && left != 0; i++, phy_addr.address += PAGE_SIZE) {
     
-            page_color = gpu->parent->arch_hal->phys_addr_to_transfer_color(gpu, phy_addr.address);
+            page_color = gpu->parent->arch_hal->phys_addr_to_transfer_color(gpu->parent, phy_addr.address);
             if (page_color != region->color) {
                 continue;
             }
@@ -767,7 +767,7 @@ NV_STATUS uvm_update_va_colored_block_region(uvm_va_block_t *va_block,
    
             phy_addr = uvm_va_block_gpu_phys_page_address(va_block, i, gpu);
 
-            page_color = gpu->parent->arch_hal->phys_addr_to_transfer_color(gpu, phy_addr.address);
+            page_color = gpu->parent->arch_hal->phys_addr_to_transfer_color(gpu->parent, phy_addr.address);
             if (page_color != region->color) {
                 continue;
             }

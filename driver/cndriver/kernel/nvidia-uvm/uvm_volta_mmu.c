@@ -280,7 +280,7 @@ static NvU32 uvm_hal_volta_mmu_phys_addr_to_true_color(uvm_parent_gpu_t *parent_
     NvU32 color;
     bool bit0;
 
-    UVM_ASSERT(uvm_gpu_supports_coloring(parent_gpu));
+    UVM_ASSERT(uvm_parent_gpu_supports_coloring(parent_gpu));
 
     //Cache Vertically Split
     //bit0 = ((phys_addr >> 12) ^ (phys_addr >> 15) ^ (phys_addr >> 16) ^ 
@@ -300,19 +300,19 @@ static NvU32 uvm_hal_volta_mmu_phys_addr_to_true_color(uvm_parent_gpu_t *parent_
 NvU32 uvm_hal_volta_mmu_phys_addr_to_allocation_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
 {
     // uvm_gpu_t *gpu;
-    UVM_ASSERT(uvm_gpu_supports_coloring(gpu));
+    UVM_ASSERT(uvm_parent_gpu_supports_coloring(parent_gpu));
 
     if (parent_gpu->num_allocation_mem_colors == 1)
         return 0;
 
-    return uvm_hal_volta_mmu_phys_addr_to_true_color(gpu, phys_addr);
+    return uvm_hal_volta_mmu_phys_addr_to_true_color(parent_gpu, phys_addr);
 }
 
 
 NvU32 uvm_hal_volta_mmu_phys_addr_to_transfer_color(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
 {
     // uvm_gpu_t *gpu;
-    UVM_ASSERT(uvm_gpu_supports_coloring(parent_gpu));
+    UVM_ASSERT(uvm_parent_gpu_supports_coloring(parent_gpu));
 
     if (parent_gpu->num_transfer_mem_colors == 1)
         return 0;
@@ -326,7 +326,7 @@ NvU32 uvm_hal_volta_mmu_phys_addr_to_transfer_color(uvm_parent_gpu_t *parent_gpu
 NvU64 uvm_hal_volta_mmu_phys_addr_to_base_transfer_color_addr(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
 {
     // uvm_gpu_t *gpu = gpu;
-    UVM_ASSERT(uvm_gpu_supports_coloring(parent_gpu));
+    UVM_ASSERT(uvm_parent_gpu_supports_coloring(parent_gpu));
 
     // Number of transfer colors must be power of 2
     UVM_ASSERT(1 << order_base_2(parent_gpu->num_transfer_mem_colors) == parent_gpu->num_transfer_mem_colors);
@@ -340,7 +340,7 @@ NvU64 uvm_hal_volta_mmu_phys_addr_to_base_transfer_color_addr(uvm_parent_gpu_t *
 NvU64 uvm_hal_volta_mmu_phys_addr_to_transfer_color_idx(uvm_parent_gpu_t *parent_gpu, NvU64 phys_addr)
 {
     // uvm_gpu_t *gpu = gpu;
-    UVM_ASSERT(uvm_gpu_supports_coloring(parent_gpu));
+    UVM_ASSERT(uvm_parent_gpu_supports_coloring(parent_gpu));
 
     // Number of transfer colors must be power of 2
     UVM_ASSERT(1 << order_base_2(parent_gpu->num_transfer_mem_colors) == parent_gpu->num_transfer_mem_colors);

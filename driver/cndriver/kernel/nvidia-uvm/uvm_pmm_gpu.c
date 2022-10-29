@@ -3430,7 +3430,7 @@ static NV_STATUS reserve_color_memory(uvm_gpu_t *gpu, uvm_pmm_gpu_t *pmm)
         UVM_ASSERT(last_address == -1 ||
                 chunk->address == last_address + chunk_size);
 
-        color = gpu->parent->arch_hal->phys_addr_to_allocation_color(gpu, chunk->address);
+        color = gpu->parent->arch_hal->phys_addr_to_allocation_color(gpu->parent, chunk->address);
 
         range = list_first_entry(&pmm->color_ranges_list[color],
                     uvm_gpu_color_range_t, list);

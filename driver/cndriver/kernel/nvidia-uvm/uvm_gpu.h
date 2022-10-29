@@ -1386,7 +1386,7 @@ static bool uvm_gpu_supports_coloring(uvm_gpu_t *gpu)
     return true;
 }
 
-static bool uvm_gpu_supports_coloring(uvm_parent_gpu_t *parent_gpu)
+static bool uvm_parent_gpu_supports_coloring(uvm_parent_gpu_t *parent_gpu)
 {
     // If coloring is not supported, both types of colors should be zero.
     UVM_ASSERT((parent_gpu->num_allocation_mem_colors == 0) ==
