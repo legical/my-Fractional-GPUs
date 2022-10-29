@@ -1932,7 +1932,7 @@ static uvm_chunk_sizes_mask_t uvm_mmu_user_chunk_sizes(uvm_gpu_t *gpu)
                                 PAGE_SIZE;
 
     // If coloring is supported, force the maximum page size to be chunk size
-    if (uvm_gpu_supports_coloring(gpu->parent)) {
+    if (uvm_gpu_supports_coloring(gpu)) {
 
         sizes &= (gpu->parent->colored_allocation_chunk_size << 1) - 1;
     }
