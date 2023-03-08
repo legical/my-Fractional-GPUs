@@ -42,7 +42,7 @@ option(FGPU_SERIALIZED_LAUNCH "As extra checks, allows only one kernel to launch
 #   多个应用程序可以一起运行。
 # 逆向工程 Reverse engineering（不用于运行外部应用程序）
 #   FGPU_COMP_COLORING_ENABLE已启用。
-#   FGPU_MEM_COLORING_ENABLED被禁用。
+#   FGPU_MEM_COLORING_ENABLED已启用。
 #   FGPU_TEST_MEM_COLORING_ENABLED已启用。
 #   在此方案中，只有逆向工程代码才打算运行（一次一个逆向工程应用程序）
 

@@ -821,6 +821,8 @@ int fgpu_prepare_launch_kernel(fgpu_dev_ctx_t *ctx, const void *func,
     uint32_t num_blocks;
     uint32_t num_threads;
     uint32_t num_pblocks;
+
+    // the maximum number of active blocks per SM for the device function
     int num_pblocks_per_sm;
     int ret;
 
@@ -852,6 +854,7 @@ int fgpu_prepare_launch_kernel(fgpu_dev_ctx_t *ctx, const void *func,
         return -EINVAL;
     }
 
+    // the maximum number of active blocks per SM for the device function * SM numbers of device
     num_pblocks = num_pblocks_per_sm * g_host_ctx->num_sm;
 
     if (num_pblocks > FGPU_MAX_NUM_PBLOCKS) {
